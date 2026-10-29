@@ -13,5 +13,45 @@
   );
   console.log("Connexion Supabase initialisée pour Nexora !");
 </script>
+  <script>
+const authForm = document.getElementById("authform");
+
+authForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const isLogin = document.getElementById("modaltitle")
+    .textContent.toLowerCase().includes("connexion");
+
+  const button = authForm.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Patiente un instant...";
+
+  try {
+    const result = isLogin
+      ? await supabaseClient.auth.signInWithPassword({ email, password })
+      : await supabaseClient.auth.signUp({ email, password });
+
+    if (result.error) throw result.error;
+
+    if (isLogin) {
+      toast("Connexion réussie !");
+    } else if (result.data.session) {
+      toast("Ton compte Nexora est créé !");
+    } else {
+      toast("Inscription envoyée ! Vérifie tes e-mails pour confirmer ton compte.");
+    }
+
+    authForm.reset();
+    closeModal();
+  } catch (error) {
+    toast("Erreur : " + error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Continuer";
+  }
+});
+</script>
  </body></html>
 
